@@ -1,0 +1,85 @@
+#include <graphics.h>
+#include <iostream>
+using namespace std;
+
+class ShapeDrawer {
+public:
+    // Function to plot a point on the screen
+    void plotPoint(int x, int y) {
+        putpixel(x, y, WHITE);
+    }
+
+    // DDA Line Drawing Algorithm
+    void ddaLine(int x1, int y1, int x2, int y2) {
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+        int steps = (abs(dx) > abs(dy)) ? abs(dx) : abs(dy); // Find the number of steps required
+
+        float Xinc = float(dx) / steps; // Calculate the increment for X
+        float Yinc = float(dy) / steps; // Calculate the increment for Y
+        float X = x1;                    // Starting X coordinate
+        float Y = y1;                    // Starting Y coordinate
+
+        for (int i = 0; i <= steps; i++) {
+            plotPoint(int(X), int(Y));  // Plot the point
+            X += Xinc;                  // Increment X
+            Y += Yinc;                  // Increment Y
+        }
+    }
+
+    // Bresenham Circle Drawing Algorithm
+    void bresenhamCircle(int x1, int y1, int r) {
+        int x = 0;
+        int y = r;
+        int p = 3 - 2 * r;  // Initial decision parameter
+
+        while (x <= y) {
+            // Plot points in all eight octants of the circle
+            plotPoint(x1 + x, y1 + y);
+            plotPoint(x1 - x, y1 + y);
+            plotPoint(x1 + x, y1 - y);
+            plotPoint(x1 - x, y1 - y);
+            plotPoint(x1 + y, y1 + x);
+            plotPoint(x1 - y, y1 + x);
+            plotPoint(x1 + y, y1 - x);
+            plotPoint(x1 - y, y1 - x);
+
+            x++;
+
+            // Update the decision parameter
+            if (p <= 0)
+                p = p + 4 * x + 6;
+            else {
+                y--;
+                p = p + 4 * (x - y) + 10;
+            }
+        }
+    }
+};
+
+// Main function
+int main() {
+    // Initialize graphics mode
+    int gd = DETECT, gm;
+    initgraph(&gd, &gm, NULL);
+
+    ShapeDrawer drawer;  // Create an instance of ShapeDrawer
+
+    // Drawing a circle using Bresenham's algorithm
+    drawer.bresenhamCircle(250, 250, 100);  // Circle centered at (250, 250) with radius 100
+    drawer.bresenhamCircle(250, 250, 100/2);
+
+    // Drawing lines using DDA algorithm
+    drawer.ddaLine(150, 80, 235, 231);  // Horizontal line
+    drawer.ddaLine(65, 230, 235, 231);  // Vertical line
+    drawer.ddaLine(150, 80, 65, 230);  // Diagonal line
+
+    // Wait for the user to press a key before closing the graphics window
+    cin.get();
+    closegraph();  // Close the graphics window
+
+    return 0;
+}
+
+
+

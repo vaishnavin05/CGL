@@ -1,0 +1,156 @@
+#include<iostream>
+#include<graphics.h>
+#include<cmath>
+
+using namespace std;
+
+class Point{
+
+   private:
+   	float x,y;
+   public:
+   	Point():x(0),y(0){};
+   	Point(float x,float y){
+   		this->x=x;
+   		this->y=y;
+   	}
+   	float getX() const{return x;}
+   	float getY() const{return y;}
+	
+	void setX(float xVal){x=xVal;}
+	void setY(float yVal){y=yVal;}
+	
+	Point operator+(const Point& other){
+		return Point(this->x+other.x,this->y+other.y);
+	}
+	Point operator*(float scale){
+		return Point(this->x*scale,this->y*scale);
+	}
+	Point operator()(float angle){
+		float rad=angle*M_PI/180;
+		float newX=x*cos(rad)-y*sin(rad);
+		float newY=x*sin(rad)+y*cos(rad);
+		return Point(newX,newY);
+	}
+	
+	void Plot()const{
+		putpixel(int(x),int(y),WHITE);
+	}
+};
+
+class Triangle{
+
+   private:
+   	Point p1,p2,p3;
+   public:
+   	Triangle(Point p1,Point p2,Point p3):p1(p1),p2(p2),p3(p3){}
+   	
+   	void draw(){
+   		line(int(p1.getX()),int(p1.getY()),int(p2.getX()),int(p2.getY()));
+   		line(int(p2.getX()),int(p2.getY()),int(p3.getX()),int(p3.getY()));
+   		line(int(p3.getX()),int(p3.getY()),int(p1.getX()),int(p1.getY()));
+   	}
+   	
+   	void translation(float tx,float ty){
+   		Point traslation(tx,ty);
+   		p1=p1+traslation;
+   		p2=p2+traslation;
+   		p3=p3+traslation;
+   	}
+   	
+   	void scaling(float sx,float sy){
+   		p1=p1*sx;
+   		p2=p2*sx;	
+   		p3=p3*sx;
+   		p1=p1*sy;
+   		p2=p2*sy;
+   		p3=p3*sy;
+   	}
+   	
+   	void rotation(float angle){
+   		p1=p1(angle);
+   		p2=p2(angle);
+   		p3=p3(angle);
+   	}
+   	
+};
+
+int main(){
+
+    int gd=DETECT,gm;
+    initgraph(&gd,&gm,NULL);
+    
+    int a1,b1,a2,b2,a3,b3;
+    
+    cout<<"Enter coordinates.."<<endl;
+    cout<<"Enter 1st coordinates :";
+    cin>>a1>>b1;
+    cout<<endl;
+    cout<<"Enter 2nd coordinate : ";
+    cin>>a2>>b2;
+    cout<<endl;
+    cout<<"Enter 3rd coordinate : ";
+    cin>>a3>>b3;
+    
+    Point p1(a1,b1),p2(a2,b2),p3(a3,b3);
+    Triangle tri(p1,p2,p3);
+    
+    tri.draw();   // Draw the original triangle
+    
+    int choice;
+    
+    while(true){
+    	cout<<"Enter choice for Transformation ";
+    	cout<<"1.Traslation"<<endl;
+    	cout<<"2.Scaling"<<endl;
+    	cout<<"3.Rotation"<<endl;
+    	cout<<"4.Exit"<<endl;
+    	cout<<"Enter your choice : ";
+    	cin>>choice;
+    	
+    	switch(choice){
+    		case 1:
+    			float tx,ty;
+    			cout<<"Enter translation factor : ";
+    			cin>>tx>>ty;
+    			tri.translation(tx,ty);
+    			break;
+    		case 2:
+    			float sx,sy;
+    			cout<<"Enter scaling factor : ";
+    			cin>>sx>>sy;
+    			tri.scaling(sx,sy);
+    			break;
+    		case 3:
+    			float angle;
+    			cout<<"Enter angle for rotation : ";
+    			cin>>angle;
+    			tri.rotation(angle);
+    			break;
+    		case 4:
+    			closegraph();
+    			return 0;
+    		default :
+    			cout<<"Enter valid choice.."<<endl;
+    	}
+    	cleardevice();
+    	tri.draw();
+    } 
+    
+    return 0;
+   
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

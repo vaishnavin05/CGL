@@ -1,0 +1,97 @@
+#include<iostream>
+#include<graphics.h>
+#include<vector>
+#include<algorithm>
+
+using namespace std;
+
+
+class shape{
+
+    protected:  
+        int gd=DETECT,gm;
+    public:
+        shape(){
+            initgraph(&gd,&gm,NULL);
+        }
+        ~shape(){
+            closegraph();
+        }
+        void setColor(int color){
+            setcolor(color);
+        }
+};
+
+class polygon:public shape{
+
+    private : 
+        vector<int>x,y;
+        int n;
+
+    public:
+        polygon(int vertices) : n(vertices){
+            x.resize(n);
+            y.resize(n);
+        }
+        void inputVertices(){
+            cout<<"Enter vertices of polygon (x,y) : ";
+            for(int i=0;i<n;i++){
+                cin>>x[i]>>y[i];
+            }
+        }
+        void drawPolygon(){
+            for(int i=0;i<n;i++){
+                line(x[i],y[i],x[(i+1)%n],y[(i+1)%n]);
+            }
+        }
+        void scanline(int fillcolor){
+            for(int yCord=0;yCord<getmaxy();yCord++){
+                vector<int> intersection;
+                for(int i=0;i<n;i++){
+                    int x1=x[i],y1=y[i];
+                    int x2=x[(i+1)%n],y2=y[(i+1)%n];
+                    
+                    if(y1>y2){
+                        swap(x1,x2);
+                        swap(y1,y2);
+                    }
+                    if(yCord>=y1 && yCord<y2){
+                        int intersectX=x1+(yCord-y1)*(x2-x1)/(y2-y1);
+                        intersection.push_back(intersectX);
+                    }
+                }
+                sort(intersection.begin(),intersection.end());
+                for(size_t i=0;i<intersection.size();i++){
+                    if(i+1<intersection.size()){
+                        for(int xCord=intersection[i];xCord<intersection[i+1];xCord++){
+                            putpixel(xCord,yCord,fillcolor);
+                        }
+                    }   
+                }
+            }
+        }     
+};
+
+int main(){
+
+    int vertices;
+    int fillcolor;
+
+    cout<<"Enter number of vertices : ";
+    cin>>vertices;
+    
+    polygon p(vertices);
+    
+    p.inputVertices();
+    p.setColor(WHITE);
+    p.drawPolygon();
+    
+    cout<<"Enter color to fill (1 to 15) : ";
+    cin>>fillcolor;
+    p.scanline(fillcolor);
+    
+    cin.get();
+    
+    return 0;
+
+}

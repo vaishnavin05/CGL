@@ -1,0 +1,96 @@
+#include <graphics.h>
+#include <conio.h>
+#include <dos.h>  // For delay function
+
+// Function to draw the sun
+void drawSun(int x, int y) {
+    setcolor(YELLOW);
+    // Draw the sun as a circle
+    circle(x, y, 40);
+    floodfill(x, y, YELLOW);
+}
+
+// Function to draw the ground
+void drawGround() {
+    setcolor(WHITE);
+    // Draw the ground at the bottom of the screen
+    line(0, getmaxy() - 20, getmaxx(), getmaxy() - 20);
+}
+
+// Function to draw mountains
+void drawMountains() {
+    setcolor(DARKGRAY);
+    // Draw mountains in the background
+    int mountainPoints[] = {0, getmaxy() - 20, 100, getmaxy() - 120, 200, getmaxy() - 80, 
+                            300, getmaxy() - 150, 400, getmaxy() - 100, 500, getmaxy() - 170,
+                            getmaxx(), getmaxy() - 20, 0, getmaxy() - 20};
+    fillpoly(7, mountainPoints);
+}
+
+// Function to draw shadows
+void drawShadows(int sunY) {
+    setcolor(DARKGRAY);
+    // Simulate shadows by drawing lines on the ground based on the sun's position
+    int shadowLength = (getmaxy() - 20 - sunY) / 2;  // Length of shadow increases as sun sets
+    line(getmaxx() / 2 - 40, getmaxy() - 20, getmaxx() / 2 - 40 + shadowLength, getmaxy() - 20 + shadowLength);
+    line(getmaxx() / 2 + 40, getmaxy() - 20, getmaxx() / 2 + 40 - shadowLength, getmaxy() - 20 + shadowLength);
+}
+
+// Function for Sunrise (Sun rising from the horizon)
+void sunrise() {
+    int x = getmaxx() / 2;  // Sun is centered horizontally
+    int y = getmaxy() - 40;  // Sun starts at the horizon
+
+    // Draw the ground and mountains
+    drawGround();
+    drawMountains();
+
+    // Animate the sunrise
+    for (int i = y; i > 40; i -= 5) {
+        cleardevice();  // Clear the screen
+        drawGround();   // Redraw the ground
+        drawMountains(); // Redraw the mountains
+        drawSun(x, i);  // Draw the sun at the new position
+        drawShadows(i);  // Draw shadows based on the sun's position
+        delay(50);      // Delay to control the speed of animation
+    }
+}
+
+// Function for Sunset (Sun setting towards the horizon)
+void sunset() {
+    int x = getmaxx() / 2;  // Sun is centered horizontally
+    int y = 40;  // Sun starts at the highest point in the sky
+
+    // Draw the ground and mountains
+    drawGround();
+    drawMountains();
+
+    // Animate the sunset
+    for (int i = y; i < getmaxy() - 40; i += 5) {
+        cleardevice();  // Clear the screen
+        drawGround();   // Redraw the ground
+        drawMountains(); // Redraw the mountains
+        drawSun(x, i);  // Draw the sun at the new position
+        drawShadows(i);  // Draw shadows based on the sun's position
+        delay(50);      // Delay to control the speed of animation
+    }
+}
+
+int main() {
+    // Initialize graphics mode
+    int gd = DETECT, gm;
+    initgraph(&gd, &gm, "");
+
+    // Sunrise animation
+    sunrise();
+
+    // Wait before transitioning to sunset
+    delay(1000);
+
+    // Sunset animation
+    sunset();
+
+    // Close the graphics mode
+    closegraph();
+    return 0;
+}
